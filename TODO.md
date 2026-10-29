@@ -29,8 +29,8 @@
       `pdf_editor/winsetup.py`. It's offered on first launch, and Uninstall removes
       everything, including the .exe itself.
 - [ ] **Entry in Windows "Installed apps" for the Python version** (optional): have `install.ps1` register PDF Editor under
-      `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\PdfEditor` (no admin
-      rights needed), with DisplayName, DisplayIcon (`static\icon.ico`), Publisher and an
+      `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\PdfEditorPython` (not
+      `PdfEditor`, which the .exe uses; no admin rights needed), with DisplayName, DisplayIcon (`static\icon.ico`), Publisher and an
       UninstallString that runs `uninstall.cmd`. Uninstalling from Settings > Apps should
       then also delete the program folder once the editor has closed, which
       `uninstall.cmd` can't do for its own folder. `-Uninstall` must remove the
