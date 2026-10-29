@@ -1,0 +1,136 @@
+"""Flask app serving the UI and the local JSON API."""
+
+import hmac
+import io
+import os
+
+from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory
+
+from . import dialogs
+from .documents import PdfError, SourceRegistry
+
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
+MAX_UPLOAD_BYTES = 1024 * 1024 * 1024  # 1 GiB, uploads only come from this machine
+
+
+def create_app(token, port):
+    app = Flask(__name__, static_folder=None)
+    app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
+    registry = SourceRegistry()
+    allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+
+    @app.before_request
+    def check_request():
+        # Reject DNS-rebinding attempts: only our own loopback host is accepted.
+        if request.host not in allowed_hosts:
+            abort(403)
+        if request.path.startswith("/api/"):
+            supplied = request.headers.get("X-Token") or request.args.get("t") or ""
+            if not hmac.compare_digest(supplied, token):
+                abort(403)
+
+    @app.after_request
+    def security_headers(resp):
+        resp.headers["Content-Security-Policy"] = (
+            "default-src 'self'; img-src 'self' blob:; style-src 'self'; "
+            "script-src 'self'; connect-src 'self'; frame-ancestors 'none'"
+        )
+        resp.headers["X-Content-Type-Options"] = "nosniff"
+        resp.headers["Referrer-Policy"] = "no-referrer"
+        return resp
+
+    @app.errorhandler(PdfError)
+    def pdf_error(e):
+        return jsonify(error=str(e)), 400
+
+    @app.errorhandler(dialogs.DialogUnavailable)
+    def no_dialog(e):
+        return jsonify(no_dialog=True, error=str(e)), 501
+
+    # ---- static UI -------------------------------------------------------
+
+    @app.get("/")
+    def index():
+        return send_from_directory(STATIC_DIR, "index.html")
+
+    @app.get("/static/<path:filename>")
+    def static_files(filename):
+        return send_from_directory(STATIC_DIR, filename)
+
+    # ---- API -------------------------------------------------------------
+
+    def load_paths(paths):
+        added, errors = [], []
+        for path in paths:
+            try:
+                added.append(registry.add_file(path).to_json())
+            except PdfError as e:
+                errors.append(str(e))
+        return jsonify(sources=added, errors=errors)
+
+    @app.post("/api/open")
+    def open_file():
+        paths = dialogs.ask_open_files(multiple=False, title="Open PDF")
+        if not paths:
+            return jsonify(cancelled=True)
+        registry.clear()
+        return load_paths(paths)
+
+    @app.post("/api/append")
+    def append_files():
+        paths = dialogs.ask_open_files(multiple=True, title="Append PDFs")
+        if not paths:
+            return jsonify(cancelled=True)
+        return load_paths(paths)
+
+    @app.post("/api/upload")
+    def upload():
+        """Fallback when native dialogs are unavailable: files come from <input type=file>."""
+        if request.args.get("replace") == "1":
+            registry.clear()
+        added, errors = [], []
+        for f in request.files.getlist("files"):
+            try:
+                added.append(registry.add_bytes(f.read(), f.filename or "upload.pdf").to_json())
+            except PdfError as e:
+                errors.append(str(e))
+        return jsonify(sources=added, errors=errors)
+
+    @app.post("/api/unlock")
+    def unlock():
+        body = request.get_json(force=True)
+        return jsonify(source=registry.unlock(body["id"], body.get("password", "")).to_json())
+
+    @app.get("/api/page/<source_id>/<int:page_no>")
+    def page_image(source_id, page_no):
+        width = request.args.get("w", 200, type=int)
+        png = registry.render_page(source_id, page_no, width)
+        return Response(png, mimetype="image/png",
+                        headers={"Cache-Control": "private, max-age=3600"})
+
+    def requested_pages():
+        body = request.get_json(force=True)
+        return [(p["src"], int(p["page"])) for p in body.get("pages", [])], body
+
+    @app.post("/api/save")
+    def save():
+        pages, body = requested_pages()
+        registry.compose(pages).close()  # validate before showing the dialog
+        path = dialogs.ask_save_file(body.get("name") or "edited.pdf")
+        if not path:
+            return jsonify(cancelled=True)
+        try:
+            registry.save(pages, path)
+        except OSError as e:
+            raise PdfError(f"Could not save to {path}: {e.strerror}") from e
+        return jsonify(path=path)
+
+    @app.post("/api/download")
+    def download():
+        """Fallback save without native dialogs: the browser saves the bytes."""
+        pages, body = requested_pages()
+        data = registry.to_bytes(pages)
+        return send_file(io.BytesIO(data), mimetype="application/pdf", as_attachment=True,
+                         download_name=body.get("name") or "edited.pdf")
+
+    return app

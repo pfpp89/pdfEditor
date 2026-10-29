@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Editor</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="group">
+      <button id="btn-open" title="Open a PDF (Ctrl+O)">Open</button>
+      <button id="btn-append" title="Append one or more PDFs to the end" disabled>Append PDFs</button>
+    </div>
+    <div class="group">
+      <button id="btn-delete" title="Delete selected pages (Del)" disabled>Delete</button>
+      <button id="btn-start" title="Move selected pages to the start" disabled>Move to start</button>
+      <button id="btn-end" title="Move selected pages to the end" disabled>Move to end</button>
+    </div>
+    <div class="group">
+      <button id="btn-undo" title="Undo (Ctrl+Z)" disabled>Undo</button>
+      <button id="btn-redo" title="Redo (Ctrl+Y)" disabled>Redo</button>
+    </div>
+    <div class="group">
+      <button id="btn-save" class="primary" title="Save as a new PDF (Ctrl+S)" disabled>Save As…</button>
+    </div>
+    <label class="zoom" title="Thumbnail size">
+      Size <input id="zoom" type="range" min="100" max="400" step="20" value="160">
+    </label>
+  </header>
+
+  <div id="sources" class="sources"></div>
+
+  <main id="grid" class="grid" tabindex="0"></main>
+
+  <div id="empty" class="empty">
+    <p>Open a PDF to get started.</p>
+    <button id="btn-open-empty" class="primary">Open PDF</button>
+    <p class="hint">Files are processed on this computer only.</p>
+  </div>
+
+  <footer class="status">
+    <span id="status-text">No document</span>
+    <span class="hint">Click to select · Ctrl+click to toggle · Shift+click for a range · Drag to reorder · Double-click to preview</span>
+  </footer>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <dialog id="preview" class="preview">
+    <div class="preview-bar">
+      <button id="prev-back" title="Previous page (←)">‹</button>
+      <span id="prev-label"></span>
+      <button id="prev-next" title="Next page (→)">›</button>
+      <button id="prev-close" title="Close (Esc)">✕</button>
+    </div>
+    <div class="preview-body"><img id="prev-img" alt=""></div>
+  </dialog>
+
+  <dialog id="pw-dialog" class="pw-dialog">
+    <form method="dialog">
+      <p id="pw-label"></p>
+      <input id="pw-input" type="password" autocomplete="off">
+      <div class="pw-actions">
+        <button value="cancel" formnovalidate>Skip file</button>
+        <button value="ok" class="primary">Unlock</button>
+      </div>
+    </form>
+  </dialog>
+
+  <input id="file-input" type="file" accept=".pdf,application/pdf" multiple hidden>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
