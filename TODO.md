@@ -10,7 +10,7 @@
       user whether to open the new PDF in the system's default PDF application.
       The server would launch it (`os.startfile` on Windows, `xdg-open` on Linux)
       through a new API endpoint that only accepts the path just saved.
-- [ ] **Right-click context menu**: right-clicking a page shows a custom context
+- [x] **Right-click context menu**: right-clicking a page shows a custom context
       menu with **Delete** for the current selection. Right-clicking a page that
       isn't selected first selects only that page. Other actions (Move to
       start/end, Preview) could be added to the same menu later.

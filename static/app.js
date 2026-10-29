@@ -477,6 +477,51 @@ $("preview").addEventListener("click", (e) => {
   if (e.target.classList.contains("preview-body")) $("preview").close();
 });
 
+// ---- context menu --------------------------------------------------------
+
+const ctxMenu = $("ctx-menu");
+
+function showContextMenu(e, uid) {
+  // Right-clicking outside the selection selects just that page, like a file manager.
+  if (!state.selected.has(uid)) {
+    state.selected.clear();
+    state.selected.add(uid);
+    state.anchor = uid;
+    render();
+  }
+  const n = state.selected.size;
+  $("ctx-delete-label").textContent = n === 1 ? "Delete page" : `Delete ${n} pages`;
+
+  ctxMenu.hidden = false;
+  const { offsetWidth: w, offsetHeight: h } = ctxMenu;
+  ctxMenu.style.left = `${Math.max(0, Math.min(e.clientX, window.innerWidth - w - 4))}px`;
+  ctxMenu.style.top = `${Math.max(0, Math.min(e.clientY, window.innerHeight - h - 4))}px`;
+  $("ctx-delete").focus();
+}
+
+function hideContextMenu() {
+  ctxMenu.hidden = true;
+}
+
+grid.addEventListener("contextmenu", (e) => {
+  const card = e.target.closest(".card");
+  if (!card) return hideContextMenu();
+  e.preventDefault();
+  showContextMenu(e, Number(card.dataset.uid));
+});
+
+$("ctx-delete").addEventListener("click", () => {
+  hideContextMenu();
+  deleteSelected();
+});
+
+document.addEventListener("mousedown", (e) => {
+  if (!ctxMenu.hidden && !ctxMenu.contains(e.target)) hideContextMenu();
+});
+grid.addEventListener("scroll", hideContextMenu);
+window.addEventListener("resize", hideContextMenu);
+window.addEventListener("blur", hideContextMenu);
+
 // ---- wiring --------------------------------------------------------------
 
 $("btn-open").addEventListener("click", () => guarded(openDocument));
@@ -503,6 +548,12 @@ grid.addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   const ctrl = e.ctrlKey || e.metaKey;
+  if (!ctxMenu.hidden) {
+    // Enter/Space activate the focused menu item through its click handler.
+    if (e.key === "Escape" || e.key === "Tab") { e.preventDefault(); hideContextMenu(); }
+    else if (e.key === "Delete") { e.preventDefault(); hideContextMenu(); deleteSelected(); }
+    return;
+  }
   if ($("preview").open) {
     if (e.key === "ArrowLeft") stepPreview(-1);
     else if (e.key === "ArrowRight") stepPreview(1);

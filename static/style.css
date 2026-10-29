@@ -210,6 +210,29 @@ button.danger:hover:not(:disabled) { background: var(--danger-bg-hover); border-
 }
 .toast.error { background: var(--danger); color: #fff; }
 
+.ctx-menu {
+  position: fixed;
+  z-index: 20;
+  min-width: 180px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+.ctx-menu[hidden] { display: none; }
+.ctx-menu button {
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  text-align: left;
+}
+.ctx-menu button:hover,
+.ctx-menu button:focus-visible { background: var(--selected-bg); outline: none; }
+.ctx-menu .ctx-danger { color: var(--danger); }
+.ctx-menu .shortcut { margin-left: auto; padding-left: 24px; color: var(--muted); font-size: 12px; }
+
 dialog {
   border: 1px solid var(--border);
   border-radius: 8px;
