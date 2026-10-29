@@ -3,6 +3,8 @@
 import hmac
 import io
 import os
+import subprocess
+import sys
 
 from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory
 
@@ -13,11 +15,27 @@ STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file
 MAX_UPLOAD_BYTES = 1024 * 1024 * 1024  # 1 GiB, uploads only come from this machine
 
 
+def open_with_default_app(path):
+    """Open `path` in the operating system's default application for its type."""
+    if sys.platform == "win32":
+        os.startfile(path)
+        return
+    opener = "open" if sys.platform == "darwin" else "xdg-open"
+    try:
+        subprocess.Popen([opener, path], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+    except FileNotFoundError as e:
+        raise OSError(f"'{opener}' is not available on this system") from e
+
+
 def create_app(token, port):
     app = Flask(__name__, static_folder=None)
     app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
     registry = SourceRegistry()
     allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+    # Only the file written by the last Save As may be opened, so the API can't be
+    # used to launch arbitrary files.
+    last_saved = {"path": None}
 
     @app.before_request
     def check_request():
@@ -123,7 +141,19 @@ def create_app(token, port):
             registry.save(pages, path)
         except OSError as e:
             raise PdfError(f"Could not save to {path}: {e.strerror}") from e
+        last_saved["path"] = path
         return jsonify(path=path)
+
+    @app.post("/api/open-saved")
+    def open_saved():
+        path = last_saved["path"]
+        if not path or not os.path.isfile(path):
+            raise PdfError("The saved file could not be found.")
+        try:
+            open_with_default_app(path)
+        except OSError as e:
+            raise PdfError(f"Could not open the file: {e.strerror or e}") from e
+        return jsonify(opened=path)
 
     @app.post("/api/download")
     def download():

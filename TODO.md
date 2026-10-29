@@ -6,7 +6,7 @@
       dialogs, error messages) and pick the language from the browser/OS locale,
       with a manual override. Server error messages in `pdf_editor/` need
       translating too.
-- [ ] **Offer to open the saved file**: right after a successful Save As, ask the
+- [x] **Offer to open the saved file**: right after a successful Save As, ask the
       user whether to open the new PDF in the system's default PDF application.
       The server would launch it (`os.startfile` on Windows, `xdg-open` on Linux)
       through a new API endpoint that only accepts the path just saved.

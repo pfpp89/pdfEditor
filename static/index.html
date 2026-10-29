@@ -105,6 +105,18 @@
     </form>
   </dialog>
 
+  <dialog id="saved-dialog" class="saved-dialog">
+    <form method="dialog">
+      <p class="saved-title">PDF saved</p>
+      <p id="saved-path" class="saved-path"></p>
+      <p>Open it in your default PDF viewer?</p>
+      <div class="pw-actions">
+        <button value="cancel">Not now</button>
+        <button value="open" class="primary" autofocus>Open</button>
+      </div>
+    </form>
+  </dialog>
+
   <input id="file-input" type="file" accept=".pdf,application/pdf" multiple hidden>
 
   <script src="/static/app.js"></script>

@@ -101,3 +101,27 @@ def test_api_requires_token_and_local_host(tmp_path):
     out = tmp_path / "dl.pdf"
     out.write_bytes(res.data)
     assert page_texts(out) == ["A1"]
+
+
+def test_open_saved_only_opens_last_saved_file(tmp_path, monkeypatch):
+    from pdf_editor import server
+
+    opened = []
+    out = tmp_path / "out.pdf"
+    monkeypatch.setattr(server, "open_with_default_app", opened.append)
+    monkeypatch.setattr(server.dialogs, "ask_save_file", lambda *a, **k: str(out))
+    client = server.create_app("tok", 5000).test_client()
+    headers = {"Host": "127.0.0.1:5000", "X-Token": "tok"}
+
+    # Nothing saved yet: refused.
+    assert client.post("/api/open-saved", headers=headers).status_code == 400
+    assert opened == []
+
+    with open(make_pdf(tmp_path / "a.pdf", "A", 2), "rb") as f:
+        src = client.post("/api/upload", data={"files": (f, "a.pdf")},
+                          headers=headers).get_json()["sources"][0]
+    res = client.post("/api/save", json={"pages": [{"src": src["id"], "page": 1}]}, headers=headers)
+    assert res.get_json()["path"] == str(out)
+
+    assert client.post("/api/open-saved", headers=headers).status_code == 200
+    assert opened == [str(out)]

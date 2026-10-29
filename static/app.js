@@ -215,7 +215,18 @@ async function saveDocument() {
     return;
   }
   state.dirty = false;
-  toast(`Saved to ${res.path}`);
+  updateControls();
+  offerToOpen(res.path);
+}
+
+function offerToOpen(path) {
+  const dlg = $("saved-dialog");
+  $("saved-path").textContent = path;
+  dlg.returnValue = "";
+  dlg.onclose = () => {
+    if (dlg.returnValue === "open") guarded(() => api("/api/open-saved"));
+  };
+  dlg.showModal();
 }
 
 // ---- editing operations --------------------------------------------------

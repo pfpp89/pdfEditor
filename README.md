@@ -51,10 +51,10 @@ Options: `--port 8000` to use a fixed port, `--no-browser` to not open a browser
 | Add PDFs to the end | **Append PDFs**. You can select several files. |
 | Select pages | Click a page. Ctrl+click toggles one page, Shift+click selects a range, Ctrl+A selects all, Esc clears. |
 | Reorder | Drag the selected pages, or use **Move to start** / **Move to end** |
-| Delete | **Delete** button or the Del key |
+| Delete | **Delete** button, the Del key, or right-click a page and choose Delete |
 | Undo / redo | Ctrl+Z / Ctrl+Y |
 | Preview a page | Double-click it (← → to step, Esc to close) |
-| Save | **Save As…** (Ctrl+S). Your original files are never modified unless you choose to overwrite them. |
+| Save | **Save As…** (Ctrl+S). Your original files are never modified unless you choose to overwrite them. Afterwards you can open the new file in your default PDF viewer. |
 
 Each page shows a colored bar and a label with the file and page it came from.
 Password-protected PDFs ask for their password when you open them.
