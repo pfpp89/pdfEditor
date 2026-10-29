@@ -67,6 +67,16 @@
   "conn.lost": "O Editor de PDF foi encerrado.",
   "conn.lost_hint": "Pode fechar esta janela e voltar a abrir o Editor de PDF a partir do respetivo ícone.",
 
+  "install.title": "Adicionar o Editor de PDF a este computador?",
+  "install.text": "Será criado um ícone do Editor de PDF no Ambiente de Trabalho e no menu Iniciar, para o abrir facilmente. Pode removê-lo mais tarde em Definições do Windows > Aplicações.",
+  "install.yes": "Sim, criar os ícones",
+  "install.no": "Não, obrigado",
+  "install.ok": "OK",
+  "install.done": "O Editor de PDF foi adicionado ao Ambiente de Trabalho e ao menu Iniciar.",
+  "install.temp_title": "Guarde primeiro o Editor de PDF",
+  "install.temp_text": "O Editor de PDF foi aberto a partir de uma pasta temporária, por exemplo diretamente de um e-mail. Guarde o PdfEditor.exe na pasta Documentos e abra-o a partir daí para o adicionar a este computador.",
+
+  "error.install_failed": "Não foi possível criar os ícones: {reason}",
   "error.read_failed": "Não foi possível ler {path}: {reason}",
   "error.invalid_pdf": "{name} não é um ficheiro PDF válido.",
   "error.unknown_document": "Documento desconhecido. Volte a abrir o ficheiro.",

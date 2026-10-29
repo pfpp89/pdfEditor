@@ -1,12 +1,20 @@
 """PDF source management, page rendering and output composition (PyMuPDF)."""
 
 import os
+import sys
 import tempfile
 import threading
 import uuid
 from collections import OrderedDict
 
-import pymupdf
+# PyMuPDF 2 installs AI add-ons (layout analysis with ONNX models, Markdown export)
+# and loads them on import when present. This editor only copies and renders pages,
+# so block them: PyMuPDF skips them on ImportError. That saves startup time, and
+# build_exe.ps1 leaves them out of PdfEditor.exe (their model files broke the bundle).
+for _optional in ("pymupdf.layout", "pymupdf4llm"):
+    sys.modules.setdefault(_optional, None)
+
+import pymupdf  # noqa: E402
 
 
 # English fallback texts. The UI translates errors by code ("error.<code>" in
@@ -22,6 +30,7 @@ ERROR_MESSAGES = {
     "save_failed": "Could not save to {path}: {reason}",
     "saved_not_found": "The saved file could not be found.",
     "open_failed": "Could not open the file: {reason}",
+    "install_failed": "Could not create the shortcuts: {reason}",
 }
 
 

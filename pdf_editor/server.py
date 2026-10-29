@@ -10,10 +10,10 @@ from flask import Flask, Response, abort, jsonify, request, send_file, send_from
 
 from . import dialogs
 from .documents import PdfError, SourceRegistry
-from . import lifecycle
+from . import lifecycle, winsetup
 from .lifecycle import ClientTracker
 
-STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
+STATIC_DIR = os.path.join(lifecycle.resource_dir(), "static")
 MAX_UPLOAD_BYTES = 1024 * 1024 * 1024  # 1 GiB, uploads only come from this machine
 LANGUAGES = {"en", "fr", "pt-PT"}  # must match I18N.LANGUAGES in static/i18n.js
 
@@ -103,6 +103,25 @@ def create_app(token, port, tracker=None):
         if lang not in LANGUAGES:
             abort(400)
         return jsonify(lifecycle.save_settings(lang=lang))
+
+    @app.get("/api/install")
+    def install_status():
+        return jsonify(state=winsetup.install_state())
+
+    @app.post("/api/install")
+    def install():
+        """Answer to the first-launch offer (PdfEditor.exe on Windows only)."""
+        if winsetup.install_state() != "offer":
+            abort(409)
+        body = request.get_json(force=True, silent=True) or {}
+        if not body.get("create"):
+            winsetup.decline()
+            return jsonify(installed=False)
+        try:
+            shortcuts = winsetup.install(body.get("name") or lifecycle.APP_NAME)
+        except OSError as e:
+            raise PdfError("install_failed", reason=e.strerror or e) from e
+        return jsonify(installed=True, shortcuts=shortcuts)
 
     @app.post("/api/heartbeat")
     def heartbeat():

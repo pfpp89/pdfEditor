@@ -126,6 +126,20 @@
     </form>
   </dialog>
 
+  <dialog id="install-dialog" class="saved-dialog">
+    <form method="dialog">
+      <p class="saved-title install-title">
+        <img src="/static/icon.svg" alt="" class="install-icon"><span id="install-title"></span>
+      </p>
+      <p id="install-text"></p>
+      <div class="pw-actions">
+        <button id="install-no" value="no" data-i18n="install.no">No, thanks</button>
+        <button id="install-yes" value="yes" class="primary" data-i18n="install.yes">Yes, create the icons</button>
+        <button id="install-ok" value="ok" class="primary" data-i18n="install.ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+
   <div id="lost" class="lost" hidden>
     <div class="lost-box">
       <p class="saved-title" data-i18n="conn.lost">PDF Editor has stopped.</p>

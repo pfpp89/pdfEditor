@@ -22,13 +22,23 @@
 - [x] **Delete button style**: make the Delete button red (it stays faded while
       disabled, i.e. when nothing is selected) and add a small icon of a page with
       an "x" to the left of the text. Use inline SVG.
-- [ ] **Single .exe (optional)**: bundle Python and the dependencies with PyInstaller
-      so the editor runs on a PC without Python installed. Downsides: a download of
-      about 60-80 MB, and antivirus software sometimes flags unsigned home-made programs.
-- [ ] **Entry in Windows "Installed apps"**: have `install.ps1` register PDF Editor under
+- [x] **Single .exe (optional)**: bundle Python and the dependencies with PyInstaller
+      so the editor runs on a PC without Python installed. Done: `build_exe.cmd` builds
+      `dist\PdfEditor.exe` (~33 MB). Antivirus software may still flag it, since it's unsigned.
+- [x] **Entry in Windows "Installed apps" for `PdfEditor.exe`**: done in
+      `pdf_editor/winsetup.py`. It's offered on first launch, and Uninstall removes
+      everything, including the .exe itself.
+- [ ] **Entry in Windows "Installed apps" for the Python version** (optional): have `install.ps1` register PDF Editor under
       `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\PdfEditor` (no admin
       rights needed), with DisplayName, DisplayIcon (`static\icon.ico`), Publisher and an
       UninstallString that runs `uninstall.cmd`. Uninstalling from Settings > Apps should
       then also delete the program folder once the editor has closed, which
       `uninstall.cmd` can't do for its own folder. `-Uninstall` must remove the
       registry entry.
+- [ ] **Test `PdfEditor.exe` on another PC** (ideally the parent's, or a clean Windows
+      user account): SmartScreen "Windows protected your PC" → Run anyway; antivirus
+      reaction; first-launch offer → Yes (icons named in the chosen language, entry in
+      Settings > Apps); open/append/reorder/delete/save; close the window → the process
+      ends; double-click twice → one editor; uninstall **from the Settings app** →
+      icons, entry, data folder and the .exe all removed; opening the .exe straight
+      from an e-mail/download → "Save PDF Editor first".

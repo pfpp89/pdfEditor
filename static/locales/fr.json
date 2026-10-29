@@ -67,6 +67,16 @@
   "conn.lost": "L’Éditeur PDF s’est arrêté.",
   "conn.lost_hint": "Vous pouvez fermer cette fenêtre et relancer l’Éditeur PDF depuis son icône.",
 
+  "install.title": "Ajouter l’Éditeur PDF à cet ordinateur ?",
+  "install.text": "Une icône Éditeur PDF sera créée sur le Bureau et dans le menu Démarrer, pour l’ouvrir facilement. Vous pourrez la supprimer plus tard depuis Paramètres Windows > Applications.",
+  "install.yes": "Oui, créer les icônes",
+  "install.no": "Non, merci",
+  "install.ok": "OK",
+  "install.done": "L’Éditeur PDF a été ajouté au Bureau et au menu Démarrer.",
+  "install.temp_title": "Enregistrez d’abord l’Éditeur PDF",
+  "install.temp_text": "L’Éditeur PDF a été ouvert depuis un dossier temporaire, par exemple directement depuis un e-mail. Enregistrez PdfEditor.exe dans votre dossier Documents, puis ouvrez-le depuis là pour l’ajouter à cet ordinateur.",
+
+  "error.install_failed": "Impossible de créer les icônes : {reason}",
   "error.read_failed": "Impossible de lire {path} : {reason}",
   "error.invalid_pdf": "{name} n’est pas un fichier PDF valide.",
   "error.unknown_document": "Document inconnu. Veuillez rouvrir le fichier.",

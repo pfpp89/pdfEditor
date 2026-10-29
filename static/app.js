@@ -722,6 +722,34 @@ window.addEventListener("pagehide", () => {
 setInterval(heartbeat, 5000);
 heartbeat();
 
+// ---- first launch of PdfEditor.exe -----------------------------------------
+// The single-file Windows build offers to add itself to the computer (Desktop and
+// Start menu icons, entry in Settings > Apps). Other setups answer "none".
+
+async function offerInstall() {
+  const res = await fetch("/api/install", { headers: { "X-Token": TOKEN } }).catch(() => null);
+  const { state: installState } = res && res.ok ? await res.json() : {};
+  if (installState !== "offer" && installState !== "temporary") return;
+
+  const offer = installState === "offer";
+  const dlg = $("install-dialog");
+  $("install-title").textContent = t(offer ? "install.title" : "install.temp_title");
+  $("install-text").textContent = t(offer ? "install.text" : "install.temp_text");
+  $("install-yes").hidden = !offer;
+  $("install-no").hidden = !offer;
+  $("install-ok").hidden = offer;
+  dlg.returnValue = "";
+  dlg.onclose = () => guarded(async () => {
+    // Esc ("") means "not now": the offer comes back next time. "No" is remembered.
+    if (!offer || !["yes", "no"].includes(dlg.returnValue)) return;
+    const created = dlg.returnValue === "yes";
+    await api("/api/install", { create: created, name: t("app.title") });
+    if (created) toast(t("install.done"));
+  });
+  dlg.showModal();
+  (offer ? $("install-yes") : $("install-ok")).focus();
+}
+
 // Drop the token from the address bar so it isn't kept in browser history.
 history.replaceState(null, "", "/");
 
@@ -737,4 +765,5 @@ history.replaceState(null, "", "/");
   buildLanguageMenu();
   I18N.setLanguage(I18N.lang, false); // refresh flag, menu state and generated texts
   render();
+  offerInstall();
 })();

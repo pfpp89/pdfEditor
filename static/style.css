@@ -309,6 +309,8 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
 .lost-box p { margin: 0 0 8px; }
 
 .saved-dialog { max-width: min(90vw, 520px); }
+.install-title { display: flex; align-items: center; gap: 10px; }
+.install-icon { width: 32px; height: 32px; flex: none; }
 .saved-dialog p { margin: 0 0 8px; }
 .saved-title { font-weight: 600; font-size: 16px; }
 .saved-path { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }

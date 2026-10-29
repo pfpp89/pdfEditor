@@ -67,6 +67,16 @@
   "conn.lost": "PDF Editor has stopped.",
   "conn.lost_hint": "You can close this window and start PDF Editor again from its icon.",
 
+  "install.title": "Add PDF Editor to this computer?",
+  "install.text": "This creates a PDF Editor icon on the Desktop and in the Start menu, so you can open it easily. You can remove it later from Windows Settings > Apps.",
+  "install.yes": "Yes, create the icons",
+  "install.no": "No, thanks",
+  "install.ok": "OK",
+  "install.done": "PDF Editor has been added to the Desktop and the Start menu.",
+  "install.temp_title": "Save PDF Editor first",
+  "install.temp_text": "PDF Editor was opened from a temporary folder, for example directly from an e-mail. Save PdfEditor.exe in your Documents folder, then open it from there to add it to this computer.",
+
+  "error.install_failed": "Could not create the icons: {reason}",
   "error.read_failed": "Cannot read {path}: {reason}",
   "error.invalid_pdf": "{name} is not a valid PDF file.",
   "error.unknown_document": "Unknown document. Please reopen the file.",

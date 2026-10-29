@@ -12,6 +12,49 @@ import webbrowser
 
 APP_NAME = "PDF Editor"
 
+# True inside the PyInstaller-built PdfEditor.exe.
+FROZEN = bool(getattr(sys, "frozen", False))
+
+
+def resource_dir():
+    """Folder holding static/: the unpacked bundle when frozen, else the project root."""
+    return getattr(sys, "_MEIPASS", None) or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+# Messages shown outside the browser UI (message boxes), in the UI's languages.
+NATIVE_TEXTS = {
+    "en": {
+        "start_failed": "PDF Editor could not start.",
+        "details": "Details",
+        "still_open": "PDF Editor is still open. Close its window, wait a few seconds and try again.",
+        "uninstalled": "PDF Editor has been removed from this computer.",
+        "uninstall_failed": "PDF Editor could not be completely removed.",
+        "not_installable": "This copy of PDF Editor runs from Python. Use uninstall.cmd in its folder instead.",
+    },
+    "fr": {
+        "start_failed": "L’Éditeur PDF n’a pas pu démarrer.",
+        "details": "Détails",
+        "still_open": "L’Éditeur PDF est encore ouvert. Fermez sa fenêtre, attendez quelques secondes et réessayez.",
+        "uninstalled": "L’Éditeur PDF a été supprimé de cet ordinateur.",
+        "uninstall_failed": "L’Éditeur PDF n’a pas pu être entièrement supprimé.",
+        "not_installable": "Cette copie de l’Éditeur PDF fonctionne avec Python. Utilisez plutôt uninstall.cmd dans son dossier.",
+    },
+    "pt-PT": {
+        "start_failed": "Não foi possível iniciar o Editor de PDF.",
+        "details": "Detalhes",
+        "still_open": "O Editor de PDF ainda está aberto. Feche a janela, aguarde alguns segundos e tente novamente.",
+        "uninstalled": "O Editor de PDF foi removido deste computador.",
+        "uninstall_failed": "Não foi possível remover completamente o Editor de PDF.",
+        "not_installable": "Esta cópia do Editor de PDF funciona com Python. Utilize antes o uninstall.cmd na respetiva pasta.",
+    },
+}
+
+
+def native_text(key):
+    """A message-box text in the language chosen in the editor (English by default)."""
+    lang = load_settings().get("lang")
+    return NATIVE_TEXTS.get(lang, NATIVE_TEXTS["en"])[key]
+
 
 # ---- auto-shutdown -----------------------------------------------------------
 
@@ -267,16 +310,26 @@ def open_app_window(url, prefer_app=True):
 
 def show_error(message):
     """Show an error to a user who may have no console window."""
+    _message_box(message, error=True)
+
+
+def show_info(message):
+    _message_box(message, error=False)
+
+
+def _message_box(message, error):
     if sys.platform == "win32":
         try:
             import ctypes
-            ctypes.windll.user32.MessageBoxW(None, message, APP_NAME, 0x10)  # MB_ICONERROR
+            flags = 0x10 if error else 0x40  # MB_ICONERROR / MB_ICONINFORMATION
+            ctypes.windll.user32.MessageBoxW(None, message, APP_NAME, flags | 0x10000)  # MB_SETFOREGROUND
             return
         except (AttributeError, OSError):
             pass
     else:
-        for cmd in (["zenity", "--error", "--title", APP_NAME, "--text", message],
-                    ["kdialog", "--title", APP_NAME, "--error", message]):
+        kind = "--error" if error else "--info"
+        for cmd in (["zenity", kind, "--title", APP_NAME, "--text", message],
+                    ["kdialog", "--title", APP_NAME, "--error" if error else "--msgbox", message]):
             if shutil.which(cmd[0]):
                 subprocess.run(cmd, check=False)
                 return

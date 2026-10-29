@@ -39,7 +39,12 @@ def main():
                         help="open in a normal browser tab instead of an app window")
     parser.add_argument("--keep-running", action="store_true",
                         help="do not stop when the last window is closed")
+    parser.add_argument("--uninstall", action="store_true",
+                        help="PdfEditor.exe only: remove shortcuts, settings and the program")
     args = parser.parse_args()
+    if args.uninstall:
+        from pdf_editor import winsetup
+        return winsetup.uninstall()
     log = logging.getLogger("pdf-editor")
     prefer_app = not args.browser_tab
 
@@ -92,9 +97,9 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        sys.exit(main() or 0)
     except Exception as exc:  # last resort: the user may have no console to see a traceback
         logging.getLogger("pdf-editor").exception("Fatal error")
-        detail = f"\n\nDetails: {lifecycle.log_path()}" if not HAS_CONSOLE else ""
-        lifecycle.show_error(f"PDF Editor could not start.\n\n{exc}{detail}")
+        detail = f"\n\n{lifecycle.native_text('details')}: {lifecycle.log_path()}" if not HAS_CONSOLE else ""
+        lifecycle.show_error(f"{lifecycle.native_text('start_failed')}\n\n{exc}{detail}")
         sys.exit(1)
