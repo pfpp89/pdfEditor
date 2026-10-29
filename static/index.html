@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PDF Editor</title>
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+  <link rel="icon" type="image/png" sizes="256x256" href="/static/icon.png">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -123,6 +125,13 @@
       </div>
     </form>
   </dialog>
+
+  <div id="lost" class="lost" hidden>
+    <div class="lost-box">
+      <p class="saved-title" data-i18n="conn.lost">PDF Editor has stopped.</p>
+      <p data-i18n="conn.lost_hint">You can close this window and start PDF Editor again from its icon.</p>
+    </div>
+  </div>
 
   <input id="file-input" type="file" accept=".pdf,application/pdf" multiple hidden>
 

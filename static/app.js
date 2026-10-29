@@ -575,6 +575,7 @@ function buildLanguageMenu() {
     item.addEventListener("click", () => {
       hideLanguageMenu();
       I18N.setLanguage(code);
+      api("/api/settings", { lang: code }).catch(() => {}); // remembered across restarts
       $("btn-lang").focus();
     });
     langMenu.appendChild(item);
@@ -647,6 +648,7 @@ grid.addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   const ctrl = e.ctrlKey || e.metaKey;
+  if (!$("lost").hidden) return;
   if (!langMenu.hidden) {
     if (e.key === "Escape" || e.key === "Tab") { e.preventDefault(); hideLanguageMenu(); $("btn-lang").focus(); }
     else if (e.key === "ArrowDown") { e.preventDefault(); stepLanguageMenu(1); }
@@ -683,12 +685,52 @@ window.addEventListener("beforeunload", (e) => {
   }
 });
 
+// ---- app lifetime --------------------------------------------------------
+// The server stops by itself once no editor window is left: each page sends a
+// heartbeat, and says goodbye when it is closed.
+
+const CLIENT_ID = (crypto.randomUUID && crypto.randomUUID()) || String(Math.random()).slice(2);
+let heartbeatFailures = 0;
+
+async function heartbeat() {
+  if (!$("lost").hidden) return;
+  try {
+    const res = await fetch("/api/heartbeat", {
+      method: "POST",
+      headers: { "X-Token": TOKEN, "Content-Type": "application/json" },
+      body: JSON.stringify({ id: CLIENT_ID }),
+    });
+    if (!res.ok) throw new Error(res.status);
+    heartbeatFailures = 0;
+  } catch {
+    if (++heartbeatFailures >= 2) showServerLost();
+  }
+}
+
+function showServerLost() {
+  state.dirty = false; // nothing can be saved any more; don't block closing the window
+  for (const dlg of document.querySelectorAll("dialog[open]")) dlg.close();
+  hideContextMenu();
+  hideLanguageMenu();
+  $("lost").hidden = false;
+}
+
+window.addEventListener("pagehide", () => {
+  const body = new Blob([JSON.stringify({ id: CLIENT_ID })], { type: "application/json" });
+  navigator.sendBeacon(`/api/bye?t=${encodeURIComponent(TOKEN)}`, body);
+});
+setInterval(heartbeat, 5000);
+heartbeat();
+
 // Drop the token from the address bar so it isn't kept in browser history.
 history.replaceState(null, "", "/");
 
 (async () => {
   try {
-    await I18N.init();
+    const settings = await fetch("/api/settings", { headers: { "X-Token": TOKEN } })
+      .then((r) => (r.ok ? r.json() : {}))
+      .catch(() => ({}));
+    await I18N.init(settings.lang);
   } catch {
     I18N.setLanguage("en", false); // locale files unreachable: keep the built-in English text
   }

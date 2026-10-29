@@ -64,6 +64,9 @@
   "dialog.all_files": "Tous les fichiers",
   "save.suffix": "-modifié",
 
+  "conn.lost": "L’Éditeur PDF s’est arrêté.",
+  "conn.lost_hint": "Vous pouvez fermer cette fenêtre et relancer l’Éditeur PDF depuis son icône.",
+
   "error.read_failed": "Impossible de lire {path} : {reason}",
   "error.invalid_pdf": "{name} n’est pas un fichier PDF valide.",
   "error.unknown_document": "Document inconnu. Veuillez rouvrir le fichier.",

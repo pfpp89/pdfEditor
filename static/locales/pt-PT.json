@@ -64,6 +64,9 @@
   "dialog.all_files": "Todos os ficheiros",
   "save.suffix": "-editado",
 
+  "conn.lost": "O Editor de PDF foi encerrado.",
+  "conn.lost_hint": "Pode fechar esta janela e voltar a abrir o Editor de PDF a partir do respetivo ícone.",
+
   "error.read_failed": "Não foi possível ler {path}: {reason}",
   "error.invalid_pdf": "{name} não é um ficheiro PDF válido.",
   "error.unknown_document": "Documento desconhecido. Volte a abrir o ficheiro.",

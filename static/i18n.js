@@ -37,7 +37,9 @@ const I18N = (() => {
   let lang = DEFAULT;
   const listeners = [];
 
-  function detect() {
+  // `preferred` is the language saved by the server (settings.json).
+  function detect(preferred) {
+    if (LANGUAGES.includes(preferred)) return preferred;
     try {
       const saved = localStorage.getItem("lang");
       if (LANGUAGES.includes(saved)) return saved;
@@ -51,12 +53,12 @@ const I18N = (() => {
     return DEFAULT;
   }
 
-  async function init() {
+  async function init(preferred) {
     await Promise.all(LANGUAGES.map(async (code) => {
       const res = await fetch(`/static/locales/${code}.json`);
       dictionaries[code] = res.ok ? await res.json() : {};
     }));
-    setLanguage(detect(), false);
+    setLanguage(detect(preferred), false);
   }
 
   function setLanguage(code, remember = true) {

@@ -64,6 +64,9 @@
   "dialog.all_files": "All files",
   "save.suffix": "-edited",
 
+  "conn.lost": "PDF Editor has stopped.",
+  "conn.lost_hint": "You can close this window and start PDF Editor again from its icon.",
+
   "error.read_failed": "Cannot read {path}: {reason}",
   "error.invalid_pdf": "{name} is not a valid PDF file.",
   "error.unknown_document": "Unknown document. Please reopen the file.",

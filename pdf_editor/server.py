@@ -10,9 +10,12 @@ from flask import Flask, Response, abort, jsonify, request, send_file, send_from
 
 from . import dialogs
 from .documents import PdfError, SourceRegistry
+from . import lifecycle
+from .lifecycle import ClientTracker
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
 MAX_UPLOAD_BYTES = 1024 * 1024 * 1024  # 1 GiB, uploads only come from this machine
+LANGUAGES = {"en", "fr", "pt-PT"}  # must match I18N.LANGUAGES in static/i18n.js
 
 
 def open_with_default_app(path):
@@ -28,8 +31,9 @@ def open_with_default_app(path):
         raise OSError(f"'{opener}' is not available on this system") from e
 
 
-def create_app(token, port):
+def create_app(token, port, tracker=None):
     app = Flask(__name__, static_folder=None)
+    tracker = tracker or ClientTracker()
     app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
     registry = SourceRegistry()
     allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
@@ -76,6 +80,40 @@ def create_app(token, port):
         return send_from_directory(STATIC_DIR, filename)
 
     # ---- API -------------------------------------------------------------
+
+    @app.get("/api/ping")
+    def ping():
+        return jsonify(ok=True)
+
+    def client_id():
+        body = request.get_json(force=True, silent=True) or {}
+        cid = body.get("id")
+        if not isinstance(cid, str) or not cid:
+            abort(400)
+        return cid[:64]
+
+    @app.get("/api/settings")
+    def get_settings():
+        return jsonify(lifecycle.load_settings())
+
+    @app.post("/api/settings")
+    def set_settings():
+        body = request.get_json(force=True, silent=True) or {}
+        lang = body.get("lang")
+        if lang not in LANGUAGES:
+            abort(400)
+        return jsonify(lifecycle.save_settings(lang=lang))
+
+    @app.post("/api/heartbeat")
+    def heartbeat():
+        tracker.beat(client_id())
+        return jsonify(ok=True)
+
+    @app.post("/api/bye")
+    def bye():
+        """Sent with navigator.sendBeacon when an editor window closes."""
+        tracker.bye(client_id())
+        return "", 204
 
     def dialog_texts(*keys):
         """Localized dialog strings sent by the UI (e.g. title), length-limited."""

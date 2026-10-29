@@ -1,11 +1,16 @@
 # Starts the PDF editor on Windows.
 # On first run it creates the .venv and installs the dependencies.
+# -SetupOnly: only prepare the .venv (used by install.ps1).
+# Other arguments are passed to app.py (e.g. --browser-tab).
+
+param([switch]$SetupOnly)
 
 $ErrorActionPreference = "Stop"
 Set-Location -LiteralPath $PSScriptRoot
 $Host.UI.RawUI.WindowTitle = "PDF Editor"
 
 $venvPython = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
+$venvPythonw = Join-Path $PSScriptRoot ".venv\Scripts\pythonw.exe"
 $marker = Join-Path $PSScriptRoot ".venv\.requirements-installed"
 $requirements = Join-Path $PSScriptRoot "requirements.txt"
 
@@ -36,8 +41,11 @@ try {
         New-Item -ItemType File -Path $marker -Force | Out-Null
     }
 
-    Write-Host "Starting PDF editor. Close this window or press Ctrl+C to stop it."
-    & $venvPython (Join-Path $PSScriptRoot "app.py") @args
+    if ($SetupOnly) { return }
+
+    # pythonw has no console window; the editor stops when its window is closed.
+    $appArgs = @("`"$(Join-Path $PSScriptRoot 'app.py')`"") + $args
+    Start-Process -FilePath $venvPythonw -ArgumentList $appArgs -WorkingDirectory $PSScriptRoot
 }
 catch {
     Write-Host ""
