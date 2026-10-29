@@ -9,8 +9,32 @@ from collections import OrderedDict
 import pymupdf
 
 
+# English fallback texts. The UI translates errors by code ("error.<code>" in
+# static/locales/*.json) and only shows these when no translation exists.
+ERROR_MESSAGES = {
+    "read_failed": "Cannot read {path}: {reason}",
+    "invalid_pdf": "{name} is not a valid PDF file.",
+    "unknown_document": "Unknown document. Please reopen the file.",
+    "wrong_password": "Wrong password.",
+    "locked": "{name} is password protected.",
+    "page_out_of_range": "Page out of range.",
+    "no_pages": "The document has no pages.",
+    "save_failed": "Could not save to {path}: {reason}",
+    "saved_not_found": "The saved file could not be found.",
+    "open_failed": "Could not open the file: {reason}",
+}
+
+
 class PdfError(Exception):
-    """A user-facing error about a PDF file."""
+    """A user-facing error, identified by a code so the UI can translate it."""
+
+    def __init__(self, code, **params):
+        self.code = code
+        self.params = {k: str(v) for k, v in params.items()}
+        super().__init__(ERROR_MESSAGES[code].format(**self.params))
+
+    def to_json(self):
+        return {"error": str(self), "code": self.code, "params": self.params}
 
 
 class Source:
@@ -65,17 +89,17 @@ class SourceRegistry:
             with open(path, "rb") as f:
                 data = f.read()
         except OSError as e:
-            raise PdfError(f"Cannot read {path}: {e.strerror}") from e
+            raise PdfError("read_failed", path=path, reason=e.strerror) from e
         return self.add_bytes(data, name or os.path.basename(path), path)
 
     def add_bytes(self, data, name, path=None):
         try:
             doc = pymupdf.open(stream=data, filetype="pdf")
         except Exception as e:
-            raise PdfError(f"{name} is not a valid PDF file.") from e
+            raise PdfError("invalid_pdf", name=name) from e
         if not doc.is_pdf:
             doc.close()
-            raise PdfError(f"{name} is not a PDF file.")
+            raise PdfError("invalid_pdf", name=name)
         src = Source(uuid.uuid4().hex[:12], name, path, doc)
         with self._lock:
             self._sources[src.id] = src
@@ -84,7 +108,7 @@ class SourceRegistry:
     def get(self, source_id):
         src = self._sources.get(source_id)
         if src is None:
-            raise PdfError("Unknown document. Please reopen the file.")
+            raise PdfError("unknown_document")
         return src
 
     def unlock(self, source_id, password):
@@ -93,7 +117,7 @@ class SourceRegistry:
             if not src.locked:
                 return src
             if not src.doc.authenticate(password):
-                raise PdfError("Wrong password.")
+                raise PdfError("wrong_password")
             return src
 
     def render_page(self, source_id, page_no, width):
@@ -107,9 +131,9 @@ class SourceRegistry:
                 return png
             src = self.get(source_id)
             if src.locked:
-                raise PdfError("Document is password protected.")
+                raise PdfError("locked", name=src.name)
             if not 0 <= page_no < src.page_count:
-                raise PdfError("Page out of range.")
+                raise PdfError("page_out_of_range")
             page = src.doc[page_no]
             zoom = width / page.rect.width
             pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
@@ -122,15 +146,15 @@ class SourceRegistry:
     def compose(self, pages):
         """Build a new document from an ordered list of (source_id, page_no)."""
         if not pages:
-            raise PdfError("The document has no pages.")
+            raise PdfError("no_pages")
         out = pymupdf.open()
         with self._lock:
             for source_id, start, end in _runs(pages):
                 src = self.get(source_id)
                 if src.locked:
-                    raise PdfError(f"{src.name} is password protected.")
+                    raise PdfError("locked", name=src.name)
                 if not (0 <= start < src.page_count and 0 <= end < src.page_count):
-                    raise PdfError("Page out of range.")
+                    raise PdfError("page_out_of_range")
                 out.insert_pdf(src.doc, from_page=start, to_page=end)
         return out
 

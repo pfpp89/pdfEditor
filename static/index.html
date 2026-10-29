@@ -9,53 +9,60 @@
 <body>
   <header class="toolbar">
     <div class="group">
-      <button id="btn-open" title="Open a PDF (Ctrl+O)">
+      <button id="btn-open" data-i18n-title="toolbar.open_tip">
         <svg class="icon icon-folder" viewBox="0 0 16 16" aria-hidden="true">
           <path fill="currentColor" d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3.2l1.5 1.5H13A1.5 1.5 0 0 1 14.5 5.5v6A1.5 1.5 0 0 1 13 13H3a1.5 1.5 0 0 1-1.5-1.5z"/>
-        </svg>Open</button>
-      <button id="btn-append" title="Append one or more PDFs to the end" disabled>
+        </svg><span data-i18n="toolbar.open">Open</span></button>
+      <button id="btn-append" data-i18n-title="toolbar.append_tip" disabled>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
           <path d="M14 3v5h5"/>
           <path d="M12 11.5v7M8.5 15h7"/>
-        </svg>Append PDFs</button>
+        </svg><span data-i18n="toolbar.append">Append PDFs</span></button>
     </div>
     <div class="group">
-      <button id="btn-delete" class="danger" title="Delete selected pages (Del)" disabled>
+      <button id="btn-delete" class="danger" data-i18n-title="toolbar.delete_tip" disabled>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
           <path d="M14 3v5h5"/>
           <path d="M9.5 12.5l5 5M14.5 12.5l-5 5"/>
-        </svg>Delete</button>
-      <button id="btn-start" title="Move selected pages to the start" disabled>
+        </svg><span data-i18n="toolbar.delete">Delete</span></button>
+      <button id="btn-start" data-i18n-title="toolbar.start_tip" disabled>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
           <path d="M11 6.5L3.5 12l7.5 5.5z"/>
           <path d="M20.5 6.5L13 12l7.5 5.5z"/>
-        </svg>Move to start</button>
-      <button id="btn-end" title="Move selected pages to the end" disabled>
+        </svg><span data-i18n="toolbar.start">Move to start</span></button>
+      <button id="btn-end" data-i18n-title="toolbar.end_tip" disabled>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
           <path d="M3.5 6.5L11 12l-7.5 5.5z"/>
           <path d="M13 6.5l7.5 5.5-7.5 5.5z"/>
-        </svg>Move to end</button>
+        </svg><span data-i18n="toolbar.end">Move to end</span></button>
     </div>
     <div class="group">
-      <button id="btn-undo" title="Undo (Ctrl+Z)" disabled>
+      <button id="btn-undo" data-i18n-title="toolbar.undo_tip" disabled>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 14L4 9l5-5"/>
           <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>
-        </svg>Undo</button>
-      <button id="btn-redo" title="Redo (Ctrl+Y)" disabled>
+        </svg><span data-i18n="toolbar.undo">Undo</span></button>
+      <button id="btn-redo" data-i18n-title="toolbar.redo_tip" disabled>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M15 14l5-5-5-5"/>
           <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>
-        </svg>Redo</button>
+        </svg><span data-i18n="toolbar.redo">Redo</span></button>
     </div>
     <div class="group">
-      <button id="btn-save" class="primary" title="Save as a new PDF (Ctrl+S)" disabled>Save As…</button>
+      <button id="btn-save" class="primary" data-i18n-title="toolbar.save_tip" disabled><span data-i18n="toolbar.save">Save As…</span></button>
     </div>
-    <label class="zoom" title="Thumbnail size">
-      Size <input id="zoom" type="range" min="100" max="400" step="20" value="160">
+    <label class="zoom" data-i18n-title="toolbar.size_tip">
+      <span data-i18n="toolbar.size">Size</span> <input id="zoom" type="range" min="100" max="400" step="20" value="160">
     </label>
+    <div class="lang">
+      <button id="btn-lang" class="lang-btn" data-i18n-title="lang.tip" aria-haspopup="menu" aria-expanded="false">
+        <span id="lang-flag" class="flag-box"></span><span id="lang-name"></span>
+        <svg class="caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="lang-menu" class="ctx-menu lang-menu" role="menu" hidden></div>
+    </div>
   </header>
 
   <div id="sources" class="sources"></div>
@@ -63,14 +70,14 @@
   <main id="grid" class="grid" tabindex="0"></main>
 
   <div id="empty" class="empty">
-    <p>Open a PDF to get started.</p>
-    <button id="btn-open-empty" class="primary">Open PDF</button>
-    <p class="hint">Files are processed on this computer only.</p>
+    <p data-i18n="empty.prompt">Open a PDF to get started.</p>
+    <button id="btn-open-empty" class="primary" data-i18n="empty.open">Open PDF</button>
+    <p class="hint" data-i18n="empty.local">Files are processed on this computer only.</p>
   </div>
 
   <footer class="status">
-    <span id="status-text">No document</span>
-    <span class="hint">Click to select · Ctrl+click to toggle · Shift+click for a range · Drag to reorder · Double-click to preview</span>
+    <span id="status-text"></span>
+    <span class="hint" data-i18n="status.hint"></span>
   </footer>
 
   <div id="toast" class="toast" hidden></div>
@@ -81,15 +88,15 @@
         <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
         <path d="M14 3v5h5"/>
         <path d="M9.5 12.5l5 5M14.5 12.5l-5 5"/>
-      </svg><span id="ctx-delete-label">Delete</span><span class="shortcut">Del</span></button>
+      </svg><span id="ctx-delete-label"></span><span class="shortcut" data-i18n="ctx.shortcut">Del</span></button>
   </div>
 
   <dialog id="preview" class="preview">
     <div class="preview-bar">
-      <button id="prev-back" title="Previous page (←)">‹</button>
+      <button id="prev-back" data-i18n-title="preview.prev_tip">‹</button>
       <span id="prev-label"></span>
-      <button id="prev-next" title="Next page (→)">›</button>
-      <button id="prev-close" title="Close (Esc)">✕</button>
+      <button id="prev-next" data-i18n-title="preview.next_tip">›</button>
+      <button id="prev-close" data-i18n-title="preview.close_tip">✕</button>
     </div>
     <div class="preview-body"><img id="prev-img" alt=""></div>
   </dialog>
@@ -99,26 +106,27 @@
       <p id="pw-label"></p>
       <input id="pw-input" type="password" autocomplete="off">
       <div class="pw-actions">
-        <button value="cancel" formnovalidate>Skip file</button>
-        <button value="ok" class="primary">Unlock</button>
+        <button value="cancel" formnovalidate data-i18n="password.skip">Skip file</button>
+        <button value="ok" class="primary" data-i18n="password.unlock">Unlock</button>
       </div>
     </form>
   </dialog>
 
   <dialog id="saved-dialog" class="saved-dialog">
     <form method="dialog">
-      <p class="saved-title">PDF saved</p>
+      <p class="saved-title" data-i18n="saved.title">PDF saved</p>
       <p id="saved-path" class="saved-path"></p>
-      <p>Open it in your default PDF viewer?</p>
+      <p data-i18n="saved.question">Open it in your default PDF viewer?</p>
       <div class="pw-actions">
-        <button value="cancel">Not now</button>
-        <button value="open" class="primary" autofocus>Open</button>
+        <button value="cancel" data-i18n="saved.not_now">Not now</button>
+        <button value="open" class="primary" autofocus data-i18n="saved.open">Open</button>
       </div>
     </form>
   </dialog>
 
   <input id="file-input" type="file" accept=".pdf,application/pdf" multiple hidden>
 
+  <script src="/static/i18n.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

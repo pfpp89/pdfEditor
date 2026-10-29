@@ -14,11 +14,11 @@ import json, sys
 import tkinter as tk
 from tkinter import filedialog
 
-mode, title, initial = sys.argv[1], sys.argv[2], sys.argv[3]
+mode, title, initial, pdf_label, all_label = sys.argv[1:6]
 root = tk.Tk()
 root.withdraw()
 root.attributes("-topmost", True)
-types = [("PDF files", "*.pdf"), ("All files", "*.*")]
+types = [(pdf_label, "*.pdf"), (all_label, "*.*")]
 if mode == "open":
     result = list(filedialog.askopenfilenames(parent=root, title=title, filetypes=types))
 elif mode == "open1":
@@ -37,10 +37,10 @@ class DialogUnavailable(Exception):
     """tkinter is missing (e.g. python3-tk not installed on Linux)."""
 
 
-def _run(mode, title, initial=""):
+def _run(mode, title, initial="", pdf_label="PDF files", all_label="All files"):
     try:
         proc = subprocess.run(
-            [sys.executable, "-c", _SCRIPT, mode, title, initial],
+            [sys.executable, "-c", _SCRIPT, mode, title, initial, pdf_label, all_label],
             capture_output=True, text=True, encoding="utf-8",
         )
     except OSError as e:
@@ -50,11 +50,12 @@ def _run(mode, title, initial=""):
     return json.loads(proc.stdout.strip().splitlines()[-1])
 
 
-def ask_open_files(multiple=True, title="Open PDF"):
+def ask_open_files(multiple=True, title="Open PDF", pdf_label="PDF files", all_label="All files"):
     """Return a list of selected paths (empty if cancelled)."""
-    return _run("open" if multiple else "open1", title)
+    return _run("open" if multiple else "open1", title, "", pdf_label, all_label)
 
 
-def ask_save_file(initial_name="edited.pdf", title="Save PDF as"):
+def ask_save_file(initial_name="edited.pdf", title="Save PDF as", pdf_label="PDF files",
+                  all_label="All files"):
     """Return the chosen path, or None if cancelled."""
-    return _run("save", title, initial_name)
+    return _run("save", title, initial_name, pdf_label, all_label)

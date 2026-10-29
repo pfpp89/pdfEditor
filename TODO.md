@@ -2,7 +2,7 @@
 
 ## Planned
 
-- [ ] **Multi-language support (i18n)**: translate the UI (toolbar, status bar,
+- [x] **Multi-language support (i18n)**: translate the UI (toolbar, status bar,
       dialogs, error messages) and pick the language from the browser/OS locale,
       with a manual override. Server error messages in `pdf_editor/` need
       translating too.

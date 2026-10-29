@@ -1,0 +1,80 @@
+{
+  "lang.name": "Français",
+  "lang.tip": "Changer de langue",
+
+  "app.title": "Éditeur PDF",
+
+  "toolbar.open": "Ouvrir",
+  "toolbar.open_tip": "Ouvrir un PDF (Ctrl+O)",
+  "toolbar.append": "Ajouter des PDF",
+  "toolbar.append_tip": "Ajouter un ou plusieurs PDF à la fin",
+  "toolbar.delete": "Supprimer",
+  "toolbar.delete_tip": "Supprimer les pages sélectionnées (Suppr)",
+  "toolbar.start": "Déplacer au début",
+  "toolbar.start_tip": "Déplacer les pages sélectionnées au début",
+  "toolbar.end": "Déplacer à la fin",
+  "toolbar.end_tip": "Déplacer les pages sélectionnées à la fin",
+  "toolbar.undo": "Annuler",
+  "toolbar.undo_tip": "Annuler (Ctrl+Z)",
+  "toolbar.redo": "Rétablir",
+  "toolbar.redo_tip": "Rétablir (Ctrl+Y)",
+  "toolbar.save": "Enregistrer sous…",
+  "toolbar.save_tip": "Enregistrer dans un nouveau PDF (Ctrl+S)",
+  "toolbar.size": "Taille",
+  "toolbar.size_tip": "Taille des miniatures",
+
+  "empty.prompt": "Ouvrez un PDF pour commencer.",
+  "empty.open": "Ouvrir un PDF",
+  "empty.local": "Les fichiers sont traités uniquement sur cet ordinateur.",
+
+  "status.none": "Aucun document",
+  "status.pages": { "one": "{n} page", "other": "{n} pages" },
+  "status.selected": { "one": "{n} sélectionnée", "other": "{n} sélectionnées" },
+  "status.unsaved": "modifications non enregistrées",
+  "status.hint": "Clic pour sélectionner · Ctrl+clic pour basculer · Maj+clic pour une plage · Glisser pour réorganiser · Double-clic pour l’aperçu",
+
+  "page.badge": "{name} · p. {page}",
+  "page.alt": "{name} page {page}",
+  "drag.pages": { "one": "{n} page", "other": "{n} pages" },
+
+  "ctx.delete": { "one": "Supprimer la page", "other": "Supprimer {n} pages" },
+  "ctx.shortcut": "Suppr",
+
+  "preview.prev_tip": "Page précédente (←)",
+  "preview.next_tip": "Page suivante (→)",
+  "preview.close_tip": "Fermer (Échap)",
+  "preview.label": "Page {index} sur {total} — {name} p. {page}",
+
+  "password.prompt": "« {name} » est protégé par un mot de passe.",
+  "password.skip": "Ignorer le fichier",
+  "password.unlock": "Déverrouiller",
+
+  "saved.title": "PDF enregistré",
+  "saved.question": "L’ouvrir dans votre lecteur PDF par défaut ?",
+  "saved.not_now": "Pas maintenant",
+  "saved.open": "Ouvrir",
+
+  "confirm.discard": "Abandonner les modifications non enregistrées et ouvrir un autre fichier ?",
+  "toast.appended": { "one": "{n} page ajoutée.", "other": "{n} pages ajoutées." },
+
+  "dialog.open_title": "Ouvrir un PDF",
+  "dialog.append_title": "Ajouter des PDF",
+  "dialog.save_title": "Enregistrer le PDF sous",
+  "dialog.pdf_files": "Fichiers PDF",
+  "dialog.all_files": "Tous les fichiers",
+  "save.suffix": "-modifié",
+
+  "error.read_failed": "Impossible de lire {path} : {reason}",
+  "error.invalid_pdf": "{name} n’est pas un fichier PDF valide.",
+  "error.unknown_document": "Document inconnu. Veuillez rouvrir le fichier.",
+  "error.wrong_password": "Mot de passe incorrect.",
+  "error.locked": "{name} est protégé par un mot de passe.",
+  "error.page_out_of_range": "Page hors limites.",
+  "error.no_pages": "Le document ne contient aucune page.",
+  "error.save_failed": "Impossible d’enregistrer dans {path} : {reason}",
+  "error.saved_not_found": "Le fichier enregistré est introuvable.",
+  "error.open_failed": "Impossible d’ouvrir le fichier : {reason}",
+  "error.request_failed": "La requête a échoué ({status}).",
+  "error.upload_failed": "Échec de l’envoi.",
+  "error.download_failed": "Échec de l’enregistrement."
+}

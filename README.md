@@ -56,6 +56,13 @@ Options: `--port 8000` to use a fixed port, `--no-browser` to not open a browser
 | Preview a page | Double-click it (← → to step, Esc to close) |
 | Save | **Save As…** (Ctrl+S). Your original files are never modified unless you choose to overwrite them. Afterwards you can open the new file in your default PDF viewer. |
 
+The interface is available in English, French and Portuguese (Portugal). Use the
+language button at the right of the toolbar to switch. The first time, the
+editor follows your browser's language, and afterwards it remembers your choice.
+To add a language, copy `static/locales/en.json`, translate its values, and add
+the code and a flag to `static/i18n.js`. `tests/test_locales.py` checks that
+every language has the same keys and placeholders.
+
 Each page shows a colored bar and a label with the file and page it came from.
 Password-protected PDFs ask for their password when you open them.
 

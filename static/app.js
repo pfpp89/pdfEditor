@@ -41,8 +41,21 @@ async function api(path, body) {
   });
   const data = await res.json().catch(() => ({}));
   if (res.status === 501 && data.no_dialog) return { no_dialog: true };
-  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  if (!res.ok) throw new Error(errorText(data) || t("error.request_failed", { status: res.status }));
   return data;
+}
+
+// Server errors carry a code + params; translate them, falling back to the English text.
+function errorText(err) {
+  if (!err) return "";
+  if (typeof err === "string") return err;
+  if (err.code && I18N.has(`error.${err.code}`)) return t(`error.${err.code}`, err.params || {});
+  return err.error || "";
+}
+
+// Localized title and file-type labels for the native file dialogs.
+function dialogTexts(titleKey) {
+  return { title: t(titleKey), pdf_label: t("dialog.pdf_files"), all_label: t("dialog.all_files") };
 }
 
 function pageUrl(src, page, width) {
@@ -100,7 +113,7 @@ function redo() {
 // ---- loading documents ---------------------------------------------------
 
 async function addSources(sources, errors) {
-  for (const err of errors || []) toast(err, true);
+  for (const err of errors || []) toast(errorText(err), true);
   const added = [];
   for (let src of sources) {
     if (src.locked) src = await askPassword(src);
@@ -116,7 +129,7 @@ function askPassword(src) {
   return new Promise((resolve) => {
     const dlg = $("pw-dialog");
     const input = $("pw-input");
-    $("pw-label").textContent = `"${src.name}" is password protected.`;
+    $("pw-label").textContent = t("password.prompt", { name: src.name });
     input.value = "";
     dlg.onclose = async () => {
       if (dlg.returnValue !== "ok") return resolve(null);
@@ -146,8 +159,8 @@ function resetDocument() {
 }
 
 async function openDocument() {
-  if (state.dirty && !confirm("Discard unsaved changes and open another file?")) return;
-  const res = await api("/api/open");
+  if (state.dirty && !confirm(t("confirm.discard"))) return;
+  const res = await api("/api/open", { dialog: dialogTexts("dialog.open_title") });
   if (res.no_dialog) return pickFiles(true);
   if (res.cancelled) return;
   await loadReplacing(res);
@@ -160,7 +173,7 @@ async function loadReplacing(res) {
 }
 
 async function appendDocuments() {
-  const res = await api("/api/append");
+  const res = await api("/api/append", { dialog: dialogTexts("dialog.append_title") });
   if (res.no_dialog) return pickFiles(false);
   if (res.cancelled) return;
   await loadAppending(res);
@@ -170,7 +183,7 @@ async function loadAppending(res) {
   const added = await addSources(res.sources, res.errors);
   if (!added.length) return render();
   commit(state.pages.concat(added));
-  toast(`Appended ${added.length} page${added.length === 1 ? "" : "s"}.`);
+  toast(t("toast.appended", { n: added.length }));
 }
 
 // Fallback used when native dialogs are unavailable (e.g. no tkinter):
@@ -187,7 +200,7 @@ function pickFiles(replace) {
       method: "POST", headers: { "X-Token": TOKEN }, body: form,
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Upload failed");
+    if (!res.ok) throw new Error(errorText(data) || t("error.upload_failed"));
     await (replace ? loadReplacing(data) : loadAppending(data));
   });
   input.click();
@@ -196,8 +209,13 @@ function pickFiles(replace) {
 async function saveDocument() {
   if (!state.pages.length) return;
   const first = state.sources.get(state.pages[0].src);
-  const name = first ? first.name.replace(/\.pdf$/i, "") + "-edited.pdf" : "edited.pdf";
-  const body = { name, pages: state.pages.map(({ src, page }) => ({ src, page })) };
+  const base = first ? first.name.replace(/\.pdf$/i, "") : "document";
+  const name = `${base}${t("save.suffix")}.pdf`;
+  const body = {
+    name,
+    pages: state.pages.map(({ src, page }) => ({ src, page })),
+    dialog: dialogTexts("dialog.save_title"),
+  };
   const res = await api("/api/save", body);
   if (res.cancelled) return;
   if (res.no_dialog) {
@@ -206,7 +224,7 @@ async function saveDocument() {
       headers: { "X-Token": TOKEN, "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Save failed");
+    if (!r.ok) throw new Error(errorText(await r.json().catch(() => null)) || t("error.download_failed"));
     const url = URL.createObjectURL(await r.blob());
     const a = Object.assign(document.createElement("a"), { href: url, download: name });
     a.click();
@@ -303,7 +321,7 @@ function onDragStart(e, uid) {
   if (dragUids.size > 1) {
     const ghost = $("drag-ghost") || Object.assign(document.createElement("div"), { id: "drag-ghost" });
     ghost.className = "drag-ghost";
-    ghost.textContent = `${dragUids.size} pages`;
+    ghost.textContent = t("drag.pages", { n: dragUids.size });
     document.body.appendChild(ghost);
     e.dataTransfer.setDragImage(ghost, 20, 20);
   }
@@ -333,23 +351,23 @@ grid.addEventListener("dragover", (e) => {
   if (!dragUids) return;
   e.preventDefault();
   e.dataTransfer.dropEffect = "move";
-  const t = dropTargetFromEvent(e);
-  if (!t) return;
-  if (dropMarker && dropMarker.el === t.el && dropMarker.after === t.after) return;
+  const target = dropTargetFromEvent(e);
+  if (!target) return;
+  if (dropMarker && dropMarker.el === target.el && dropMarker.after === target.after) return;
   clearDropMarker();
-  t.el.classList.add(t.after ? "drop-after" : "drop-before");
-  dropMarker = t;
+  target.el.classList.add(target.after ? "drop-after" : "drop-before");
+  dropMarker = target;
 });
 
 grid.addEventListener("drop", (e) => {
   if (!dragUids) return;
   e.preventDefault();
-  const t = dropTargetFromEvent(e);
+  const target = dropTargetFromEvent(e);
   const uids = dragUids;
   onDragEnd();
-  if (!t) return;
+  if (!target) return;
   // Find the first page after the drop point that is not itself being moved.
-  let idx = state.pages.findIndex((p) => p.uid === Number(t.el.dataset.uid)) + (t.after ? 1 : 0);
+  let idx = state.pages.findIndex((p) => p.uid === Number(target.el.dataset.uid)) + (target.after ? 1 : 0);
   while (idx < state.pages.length && uids.has(state.pages[idx].uid)) idx++;
   moveTo(uids, idx < state.pages.length ? state.pages[idx].uid : null);
 });
@@ -368,21 +386,26 @@ function makeCard(item) {
   img.loading = "lazy";
   img.decoding = "async";
   img.draggable = false;
-  img.alt = `${src.name} page ${item.page + 1}`;
   card.appendChild(img);
 
   const label = document.createElement("div");
   label.className = "label";
   label.innerHTML = `<span class="num"></span><span class="badge"></span>`;
-  label.querySelector(".badge").textContent = `${src.name} · p${item.page + 1}`;
   label.querySelector(".badge").title = src.name;
   card.appendChild(label);
+  labelCard(card, item);
 
   card.addEventListener("click", (e) => onCardClick(e, item.uid));
   card.addEventListener("dblclick", () => openPreview(item.uid));
   card.addEventListener("dragstart", (e) => onDragStart(e, item.uid));
   card.addEventListener("dragend", onDragEnd);
   return card;
+}
+
+function labelCard(card, item) {
+  const params = { name: state.sources.get(item.src).name, page: item.page + 1 };
+  card.firstChild.alt = t("page.alt", params);
+  card.querySelector(".badge").textContent = t("page.badge", params);
 }
 
 function thumbRequestWidth() {
@@ -447,10 +470,11 @@ function updateControls() {
   $("btn-undo").disabled = !state.undo.length;
   $("btn-redo").disabled = !state.redo.length;
   $("btn-save").disabled = !n;
-  $("status-text").textContent = hasDoc
-    ? `${n} page${n === 1 ? "" : "s"}${s ? ` · ${s} selected` : ""}${state.dirty ? " · unsaved changes" : ""}`
-    : "No document";
-  document.title = hasDoc ? `${state.dirty ? "• " : ""}PDF Editor` : "PDF Editor";
+  const parts = [t("status.pages", { n })];
+  if (s) parts.push(t("status.selected", { n: s }));
+  if (state.dirty) parts.push(t("status.unsaved"));
+  $("status-text").textContent = hasDoc ? parts.join(" · ") : t("status.none");
+  document.title = `${hasDoc && state.dirty ? "• " : ""}${t("app.title")}`;
 }
 
 // ---- preview -------------------------------------------------------------
@@ -469,7 +493,9 @@ function showPreviewPage() {
   const src = state.sources.get(item.src);
   const w = Math.min(2400, Math.ceil((Math.min(window.innerWidth, 1400) * (window.devicePixelRatio || 1)) / 200) * 200);
   $("prev-img").src = pageUrl(item.src, item.page, w);
-  $("prev-label").textContent = `Page ${previewIndex + 1} of ${state.pages.length} — ${src.name} p${item.page + 1}`;
+  $("prev-label").textContent = t("preview.label", {
+    index: previewIndex + 1, total: state.pages.length, name: src.name, page: item.page + 1,
+  });
   $("prev-back").disabled = previewIndex === 0;
   $("prev-next").disabled = previewIndex === state.pages.length - 1;
 }
@@ -501,7 +527,7 @@ function showContextMenu(e, uid) {
     render();
   }
   const n = state.selected.size;
-  $("ctx-delete-label").textContent = n === 1 ? "Delete page" : `Delete ${n} pages`;
+  $("ctx-delete-label").textContent = t("ctx.delete", { n });
 
   ctxMenu.hidden = false;
   const { offsetWidth: w, offsetHeight: h } = ctxMenu;
@@ -533,6 +559,68 @@ grid.addEventListener("scroll", hideContextMenu);
 window.addEventListener("resize", hideContextMenu);
 window.addEventListener("blur", hideContextMenu);
 
+// ---- language ------------------------------------------------------------
+
+const langMenu = $("lang-menu");
+
+function buildLanguageMenu() {
+  langMenu.replaceChildren();
+  for (const code of I18N.LANGUAGES) {
+    const item = document.createElement("button");
+    item.setAttribute("role", "menuitemradio");
+    item.dataset.lang = code;
+    item.lang = code;
+    item.innerHTML = `<span class="flag-box">${I18N.FLAGS[code]}</span><span></span>`;
+    item.lastChild.textContent = I18N.nameOf(code);
+    item.addEventListener("click", () => {
+      hideLanguageMenu();
+      I18N.setLanguage(code);
+      $("btn-lang").focus();
+    });
+    langMenu.appendChild(item);
+  }
+}
+
+function showLanguageMenu() {
+  hideContextMenu();
+  langMenu.hidden = false;
+  $("btn-lang").setAttribute("aria-expanded", "true");
+  (langMenu.querySelector('[aria-checked="true"]') || langMenu.firstChild).focus();
+}
+
+function hideLanguageMenu() {
+  langMenu.hidden = true;
+  $("btn-lang").setAttribute("aria-expanded", "false");
+}
+
+function stepLanguageMenu(delta) {
+  const items = Array.from(langMenu.children);
+  const i = items.indexOf(document.activeElement);
+  items[(i + delta + items.length) % items.length].focus();
+}
+
+$("btn-lang").addEventListener("click", () => (langMenu.hidden ? showLanguageMenu() : hideLanguageMenu()));
+document.addEventListener("mousedown", (e) => {
+  if (!langMenu.hidden && !e.target.closest(".lang")) hideLanguageMenu();
+});
+window.addEventListener("blur", hideLanguageMenu);
+
+// Re-translate everything that is generated by script rather than marked with data-i18n.
+I18N.onChange((code) => {
+  $("lang-flag").innerHTML = I18N.FLAGS[code];
+  $("lang-name").textContent = I18N.nameOf(code);
+  for (const item of langMenu.children) {
+    item.setAttribute("aria-checked", String(item.dataset.lang === code));
+  }
+  for (const item of state.pages) {
+    const card = cards.get(item.uid);
+    if (card) labelCard(card, item);
+  }
+  if ($("preview").open) showPreviewPage();
+  hideContextMenu();
+  updateControls();
+});
+
 // ---- wiring --------------------------------------------------------------
 
 $("btn-open").addEventListener("click", () => guarded(openDocument));
@@ -559,6 +647,12 @@ grid.addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   const ctrl = e.ctrlKey || e.metaKey;
+  if (!langMenu.hidden) {
+    if (e.key === "Escape" || e.key === "Tab") { e.preventDefault(); hideLanguageMenu(); $("btn-lang").focus(); }
+    else if (e.key === "ArrowDown") { e.preventDefault(); stepLanguageMenu(1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); stepLanguageMenu(-1); }
+    return;
+  }
   if (!ctxMenu.hidden) {
     // Enter/Space activate the focused menu item through its click handler.
     if (e.key === "Escape" || e.key === "Tab") { e.preventDefault(); hideContextMenu(); }
@@ -591,4 +685,14 @@ window.addEventListener("beforeunload", (e) => {
 
 // Drop the token from the address bar so it isn't kept in browser history.
 history.replaceState(null, "", "/");
-render();
+
+(async () => {
+  try {
+    await I18N.init();
+  } catch {
+    I18N.setLanguage("en", false); // locale files unreachable: keep the built-in English text
+  }
+  buildLanguageMenu();
+  I18N.setLanguage(I18N.lang, false); // refresh flag, menu state and generated texts
+  render();
+})();

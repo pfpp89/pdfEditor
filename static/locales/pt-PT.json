@@ -1,0 +1,80 @@
+{
+  "lang.name": "Português",
+  "lang.tip": "Mudar de idioma",
+
+  "app.title": "Editor de PDF",
+
+  "toolbar.open": "Abrir",
+  "toolbar.open_tip": "Abrir um PDF (Ctrl+O)",
+  "toolbar.append": "Acrescentar PDFs",
+  "toolbar.append_tip": "Acrescentar um ou mais PDFs no fim",
+  "toolbar.delete": "Eliminar",
+  "toolbar.delete_tip": "Eliminar as páginas selecionadas (Del)",
+  "toolbar.start": "Mover para o início",
+  "toolbar.start_tip": "Mover as páginas selecionadas para o início",
+  "toolbar.end": "Mover para o fim",
+  "toolbar.end_tip": "Mover as páginas selecionadas para o fim",
+  "toolbar.undo": "Anular",
+  "toolbar.undo_tip": "Anular (Ctrl+Z)",
+  "toolbar.redo": "Refazer",
+  "toolbar.redo_tip": "Refazer (Ctrl+Y)",
+  "toolbar.save": "Guardar como…",
+  "toolbar.save_tip": "Guardar como um novo PDF (Ctrl+S)",
+  "toolbar.size": "Tamanho",
+  "toolbar.size_tip": "Tamanho das miniaturas",
+
+  "empty.prompt": "Abra um PDF para começar.",
+  "empty.open": "Abrir PDF",
+  "empty.local": "Os ficheiros são processados apenas neste computador.",
+
+  "status.none": "Nenhum documento",
+  "status.pages": { "one": "{n} página", "other": "{n} páginas" },
+  "status.selected": { "one": "{n} selecionada", "other": "{n} selecionadas" },
+  "status.unsaved": "alterações por guardar",
+  "status.hint": "Clique para selecionar · Ctrl+clique para alternar · Shift+clique para um intervalo · Arraste para reordenar · Duplo clique para pré-visualizar",
+
+  "page.badge": "{name} · p. {page}",
+  "page.alt": "{name} página {page}",
+  "drag.pages": { "one": "{n} página", "other": "{n} páginas" },
+
+  "ctx.delete": { "one": "Eliminar página", "other": "Eliminar {n} páginas" },
+  "ctx.shortcut": "Del",
+
+  "preview.prev_tip": "Página anterior (←)",
+  "preview.next_tip": "Página seguinte (→)",
+  "preview.close_tip": "Fechar (Esc)",
+  "preview.label": "Página {index} de {total} — {name} p. {page}",
+
+  "password.prompt": "«{name}» está protegido por palavra-passe.",
+  "password.skip": "Ignorar ficheiro",
+  "password.unlock": "Desbloquear",
+
+  "saved.title": "PDF guardado",
+  "saved.question": "Abri-lo no visualizador de PDF predefinido?",
+  "saved.not_now": "Agora não",
+  "saved.open": "Abrir",
+
+  "confirm.discard": "Descartar as alterações por guardar e abrir outro ficheiro?",
+  "toast.appended": { "one": "Foi acrescentada {n} página.", "other": "Foram acrescentadas {n} páginas." },
+
+  "dialog.open_title": "Abrir PDF",
+  "dialog.append_title": "Acrescentar PDFs",
+  "dialog.save_title": "Guardar PDF como",
+  "dialog.pdf_files": "Ficheiros PDF",
+  "dialog.all_files": "Todos os ficheiros",
+  "save.suffix": "-editado",
+
+  "error.read_failed": "Não foi possível ler {path}: {reason}",
+  "error.invalid_pdf": "{name} não é um ficheiro PDF válido.",
+  "error.unknown_document": "Documento desconhecido. Volte a abrir o ficheiro.",
+  "error.wrong_password": "Palavra-passe incorreta.",
+  "error.locked": "{name} está protegido por palavra-passe.",
+  "error.page_out_of_range": "Página fora do intervalo.",
+  "error.no_pages": "O documento não tem páginas.",
+  "error.save_failed": "Não foi possível guardar em {path}: {reason}",
+  "error.saved_not_found": "Não foi possível encontrar o ficheiro guardado.",
+  "error.open_failed": "Não foi possível abrir o ficheiro: {reason}",
+  "error.request_failed": "O pedido falhou ({status}).",
+  "error.upload_failed": "O envio falhou.",
+  "error.download_failed": "Não foi possível guardar."
+}

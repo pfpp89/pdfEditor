@@ -1,0 +1,80 @@
+{
+  "lang.name": "English",
+  "lang.tip": "Change language",
+
+  "app.title": "PDF Editor",
+
+  "toolbar.open": "Open",
+  "toolbar.open_tip": "Open a PDF (Ctrl+O)",
+  "toolbar.append": "Append PDFs",
+  "toolbar.append_tip": "Append one or more PDFs to the end",
+  "toolbar.delete": "Delete",
+  "toolbar.delete_tip": "Delete selected pages (Del)",
+  "toolbar.start": "Move to start",
+  "toolbar.start_tip": "Move selected pages to the start",
+  "toolbar.end": "Move to end",
+  "toolbar.end_tip": "Move selected pages to the end",
+  "toolbar.undo": "Undo",
+  "toolbar.undo_tip": "Undo (Ctrl+Z)",
+  "toolbar.redo": "Redo",
+  "toolbar.redo_tip": "Redo (Ctrl+Y)",
+  "toolbar.save": "Save As…",
+  "toolbar.save_tip": "Save as a new PDF (Ctrl+S)",
+  "toolbar.size": "Size",
+  "toolbar.size_tip": "Thumbnail size",
+
+  "empty.prompt": "Open a PDF to get started.",
+  "empty.open": "Open PDF",
+  "empty.local": "Files are processed on this computer only.",
+
+  "status.none": "No document",
+  "status.pages": { "one": "{n} page", "other": "{n} pages" },
+  "status.selected": { "one": "{n} selected", "other": "{n} selected" },
+  "status.unsaved": "unsaved changes",
+  "status.hint": "Click to select · Ctrl+click to toggle · Shift+click for a range · Drag to reorder · Double-click to preview",
+
+  "page.badge": "{name} · p{page}",
+  "page.alt": "{name} page {page}",
+  "drag.pages": { "one": "{n} page", "other": "{n} pages" },
+
+  "ctx.delete": { "one": "Delete page", "other": "Delete {n} pages" },
+  "ctx.shortcut": "Del",
+
+  "preview.prev_tip": "Previous page (←)",
+  "preview.next_tip": "Next page (→)",
+  "preview.close_tip": "Close (Esc)",
+  "preview.label": "Page {index} of {total} — {name} p{page}",
+
+  "password.prompt": "\"{name}\" is password protected.",
+  "password.skip": "Skip file",
+  "password.unlock": "Unlock",
+
+  "saved.title": "PDF saved",
+  "saved.question": "Open it in your default PDF viewer?",
+  "saved.not_now": "Not now",
+  "saved.open": "Open",
+
+  "confirm.discard": "Discard unsaved changes and open another file?",
+  "toast.appended": { "one": "Appended {n} page.", "other": "Appended {n} pages." },
+
+  "dialog.open_title": "Open PDF",
+  "dialog.append_title": "Append PDFs",
+  "dialog.save_title": "Save PDF as",
+  "dialog.pdf_files": "PDF files",
+  "dialog.all_files": "All files",
+  "save.suffix": "-edited",
+
+  "error.read_failed": "Cannot read {path}: {reason}",
+  "error.invalid_pdf": "{name} is not a valid PDF file.",
+  "error.unknown_document": "Unknown document. Please reopen the file.",
+  "error.wrong_password": "Wrong password.",
+  "error.locked": "{name} is password protected.",
+  "error.page_out_of_range": "Page out of range.",
+  "error.no_pages": "The document has no pages.",
+  "error.save_failed": "Could not save to {path}: {reason}",
+  "error.saved_not_found": "The saved file could not be found.",
+  "error.open_failed": "Could not open the file: {reason}",
+  "error.request_failed": "Request failed ({status}).",
+  "error.upload_failed": "Upload failed.",
+  "error.download_failed": "Save failed."
+}

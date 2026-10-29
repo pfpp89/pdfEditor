@@ -233,6 +233,24 @@ button.danger:hover:not(:disabled) { background: var(--danger-bg-hover); border-
 .ctx-menu .ctx-danger { color: var(--danger); }
 .ctx-menu .shortcut { margin-left: auto; padding-left: 24px; color: var(--muted); font-size: 12px; }
 
+.lang { position: relative; }
+.lang-btn { padding: 6px 10px; }
+.lang-btn .caret { width: 12px; height: 12px; color: var(--muted); }
+.flag-box { display: inline-flex; flex: none; }
+.flag {
+  width: 20px;
+  height: 14px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.ctx-menu.lang-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 160px;
+}
+.lang-menu [aria-checked="true"] { font-weight: 600; background: var(--selected-bg); }
+
 dialog {
   border: 1px solid var(--border);
   border-radius: 8px;

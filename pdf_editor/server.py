@@ -59,7 +59,7 @@ def create_app(token, port):
 
     @app.errorhandler(PdfError)
     def pdf_error(e):
-        return jsonify(error=str(e)), 400
+        return jsonify(e.to_json()), 400
 
     @app.errorhandler(dialogs.DialogUnavailable)
     def no_dialog(e):
@@ -77,18 +77,24 @@ def create_app(token, port):
 
     # ---- API -------------------------------------------------------------
 
+    def dialog_texts(*keys):
+        """Localized dialog strings sent by the UI (e.g. title), length-limited."""
+        body = request.get_json(silent=True) or {}
+        texts = body.get("dialog") or {}
+        return {k: str(texts[k])[:200] for k in keys if isinstance(texts.get(k), str) and texts[k]}
+
     def load_paths(paths):
         added, errors = [], []
         for path in paths:
             try:
                 added.append(registry.add_file(path).to_json())
             except PdfError as e:
-                errors.append(str(e))
+                errors.append(e.to_json())
         return jsonify(sources=added, errors=errors)
 
     @app.post("/api/open")
     def open_file():
-        paths = dialogs.ask_open_files(multiple=False, title="Open PDF")
+        paths = dialogs.ask_open_files(multiple=False, **dialog_texts("title", "pdf_label", "all_label"))
         if not paths:
             return jsonify(cancelled=True)
         registry.clear()
@@ -96,7 +102,7 @@ def create_app(token, port):
 
     @app.post("/api/append")
     def append_files():
-        paths = dialogs.ask_open_files(multiple=True, title="Append PDFs")
+        paths = dialogs.ask_open_files(multiple=True, **dialog_texts("title", "pdf_label", "all_label"))
         if not paths:
             return jsonify(cancelled=True)
         return load_paths(paths)
@@ -111,7 +117,7 @@ def create_app(token, port):
             try:
                 added.append(registry.add_bytes(f.read(), f.filename or "upload.pdf").to_json())
             except PdfError as e:
-                errors.append(str(e))
+                errors.append(e.to_json())
         return jsonify(sources=added, errors=errors)
 
     @app.post("/api/unlock")
@@ -134,13 +140,14 @@ def create_app(token, port):
     def save():
         pages, body = requested_pages()
         registry.compose(pages).close()  # validate before showing the dialog
-        path = dialogs.ask_save_file(body.get("name") or "edited.pdf")
+        path = dialogs.ask_save_file(body.get("name") or "edited.pdf",
+                                     **dialog_texts("title", "pdf_label", "all_label"))
         if not path:
             return jsonify(cancelled=True)
         try:
             registry.save(pages, path)
         except OSError as e:
-            raise PdfError(f"Could not save to {path}: {e.strerror}") from e
+            raise PdfError("save_failed", path=path, reason=e.strerror) from e
         last_saved["path"] = path
         return jsonify(path=path)
 
@@ -148,11 +155,11 @@ def create_app(token, port):
     def open_saved():
         path = last_saved["path"]
         if not path or not os.path.isfile(path):
-            raise PdfError("The saved file could not be found.")
+            raise PdfError("saved_not_found")
         try:
             open_with_default_app(path)
         except OSError as e:
-            raise PdfError(f"Could not open the file: {e.strerror or e}") from e
+            raise PdfError("open_failed", reason=e.strerror or e) from e
         return jsonify(opened=path)
 
     @app.post("/api/download")
