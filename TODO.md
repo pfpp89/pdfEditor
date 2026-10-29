@@ -14,11 +14,11 @@
       menu with **Delete** for the current selection. Right-clicking a page that
       isn't selected first selects only that page. Other actions (Move to
       start/end, Preview) could be added to the same menu later.
-- [ ] **Undo/Redo icons**: add the classic curved-arrow icons (↶ undo, ↷ redo) to
+- [x] **Undo/Redo icons**: add the classic curved-arrow icons (↶ undo, ↷ redo) to
       the Undo and Redo buttons. Use inline SVG so nothing is loaded from outside
       and the icons follow the light/dark theme.
-- [ ] **Open button icon**: add a small gray folder icon to the left of the "Open"
+- [x] **Open button icon**: add a small gray folder icon to the left of the "Open"
       text. Use inline SVG, like the Undo/Redo icons.
-- [ ] **Delete button style**: make the Delete button red (it stays faded while
+- [x] **Delete button style**: make the Delete button red (it stays faded while
       disabled, i.e. when nothing is selected) and add a small icon of a page with
       an "x" to the left of the text. Use inline SVG.

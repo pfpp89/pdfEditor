@@ -8,6 +8,9 @@
   --accent-text: #ffffff;
   --selected-bg: rgba(47, 111, 222, 0.14);
   --danger: #c92a2a;
+  --danger-bg: #d32f2f;
+  --danger-bg-hover: #b71c1c;
+  --icon-gray: #7a8089;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   color-scheme: light dark;
 }
@@ -22,6 +25,9 @@
     --accent: #5b8ff0;
     --selected-bg: rgba(91, 143, 240, 0.22);
     --danger: #ff6b6b;
+    --danger-bg: #d32f2f;
+    --danger-bg-hover: #e53935;
+    --icon-gray: #9aa0a6;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
 }
@@ -40,6 +46,9 @@ body {
 }
 
 button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font: inherit;
   padding: 6px 12px;
   border: 1px solid var(--border);
@@ -51,6 +60,11 @@ button {
 button:hover:not(:disabled) { border-color: var(--accent); }
 button:disabled { opacity: 0.45; cursor: default; }
 button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+button.danger { background: var(--danger-bg); border-color: var(--danger-bg); color: #fff; }
+button.danger:hover:not(:disabled) { background: var(--danger-bg-hover); border-color: var(--danger-bg-hover); }
+
+.icon { width: 16px; height: 16px; flex: none; }
+.icon-folder { color: var(--icon-gray); }
 
 .toolbar {
   display: flex;
