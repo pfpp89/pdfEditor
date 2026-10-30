@@ -361,8 +361,11 @@ refresh the shortcuts.
 - `/api/open-saved` only opens the file written by the last Save As, never a path
   sent by the page.
 
-## License note
+## License
 
-PyMuPDF is licensed under AGPL-3.0 (commercial licenses are also available).
-That is fine for personal or internal use. Check its terms before you distribute
-this app.
+PDF Editor is licensed under the GNU Affero General Public License v3.0
+(AGPL-3.0). See [`LICENSE`](LICENSE).
+
+It uses PyMuPDF, which is also licensed under AGPL-3.0 (commercial licenses are
+available). Anyone who receives `PdfEditor.exe` can get the source code from this
+repository.
