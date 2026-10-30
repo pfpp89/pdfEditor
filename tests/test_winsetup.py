@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pytest
 
@@ -24,6 +25,10 @@ def frozen_exe(tmp_path, monkeypatch):
     state.mkdir()
     monkeypatch.setattr(lifecycle, "state_dir", lambda: str(state))
     monkeypatch.setattr(lifecycle, "FROZEN", True)
+    # Windows paths are case-insensitive, also when the tests run on Linux.
+    # Checked before sys.platform is faked below.
+    if sys.platform != "win32":
+        monkeypatch.setattr(winsetup.os.path, "normcase", str.lower)
     monkeypatch.setattr(winsetup.sys, "platform", "win32")
     monkeypatch.setattr(winsetup, "exe_path", lambda: str(exe))
     monkeypatch.setattr(winsetup, "registered_exe", lambda: None)
